@@ -1,12 +1,21 @@
 <template>
   <div id="app">
     <h1 class="title">vue-list</h1>
+    <p>An infinite load more list component.</p>
+    <hr>
     <div class="content">
       <div class="preview">
-        <vue-list :list.sync='list'></vue-list>
+        <div class="preview-content">
+          <vue-list :list.sync='list'></vue-list>
+        </div>
       </div>
       <div class="setting">
-        setting
+        <p>Total items: {{list.length}}</p>
+        <p>Total items: {{from}}</p>
+        <p>Total items: {{to}}</p>
+        <p>Total items: {{top}}</p>
+        <p>Total items: {{bottom}}</p>
+        <p>Total items: {{list.length}}</p>
       </div>
     </div>
   </div>
@@ -19,7 +28,11 @@ export default {
   name: 'app',
   data() {
     return {
-      list: []
+      list: [],
+      from: 0,
+      to: 0,
+      top: 0,
+      bottom: 0
     }
   },
   created() {
@@ -28,6 +41,14 @@ export default {
         title: 'list ' + new Date().getTime()
       });
     }
+
+    this.$on('scrollData', (from, to, top, bottom) => {
+      console.log('in');
+      this.from = from;
+      this.to = to;
+      this.top = top;
+      this.bottom = bottom;
+    })
   },
   components: {
     vueList
@@ -42,18 +63,29 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
   .title{
     line-height: 50px;
   }
   .content{
     display: flex;
     width: 800px;
-    height: 500px;
+    height: 650px;
     margin: 0 auto;
     &>div{
       flex: 1;
       height: 100%;
+    }
+    .preview{
+      background: url("~assets/iphone.png") center center no-repeat;
+      background-size: 324px 642px;
+      position: relative;
+      .preview-content{
+        width: 256px;
+        height: 464px;
+        position: absolute;
+        left: 72px;
+        top: 91px;
+      }
     }
   }
 }

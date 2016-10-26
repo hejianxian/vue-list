@@ -10,6 +10,7 @@
 </template>
 
 <script>
+
 export default {
   name: 'vue-list',
   props: {
@@ -60,10 +61,9 @@ export default {
       if (this.lastScrollTop === null || Math.abs(_scrollTop - this.lastScrollTop) > this._max) {
           this.lastScrollTop = _scrollTop;
       } else {
-          console.log(_height, _scrollTop, _contentHeight, _height-_scrollTop-_contentHeight);
+          // console.log(_height, _scrollTop, _contentHeight, _height-_scrollTop-_contentHeight);
           if (this.to === this.list.length && _height - _scrollTop - _contentHeight < this.distance) {
             this.canScroll && this.loadmore(this.from, this.to);
-            console.log('loadmore when go end');
           }
           return;
       }
@@ -81,6 +81,7 @@ export default {
       this.to = _to;
       this.lineTopHeight = _from * this.height;
       this.lineBottomHeight = (this.list.length - _to) * this.height;
+      this.$emit('scrollData',this.from, this.to, this.lineTopHeight, this.lineBottomHeight);
 
       this.previewList = [];
       for (; _from < _to; _from++) {
@@ -117,6 +118,9 @@ export default {
   width: 100%;
   height: 100%;
   overflow-y: auto;
+  &::scroll-bar{
+    width: 0;
+  }
   ul {
     margin: 0;
     padding: 0;
@@ -126,8 +130,9 @@ export default {
       font-size: 14px;
       line-height: 3;
       text-align: left;
-      padding-left: 20px;
+      padding-left: 15px;
       border-bottom: 1px solid #ddd;
+      background: #fff;
     }
   }
   .load-more-gif{
@@ -135,6 +140,7 @@ export default {
     height: 44px;
     text-align: center;
     line-height: 44px;
+    background: #fff;
   }
 }
 </style>
