@@ -27,6 +27,9 @@ export default {
     canScroll: {
       type: Boolean,
       default: true
+    },
+    dispatchData: {
+      type: Function
     }
   },
   data() {
@@ -36,7 +39,8 @@ export default {
       lineTopHeight: 0,
       lineBottomHeight: 0,
       canLoadmore: true,
-      previewList: []
+      previewList: [],
+      displayCount: 0
     }
   },
   computed: {},
@@ -57,6 +61,12 @@ export default {
       let _scrollTop = this.$el.scrollTop,
           _height = this.$el.querySelectorAll('ul')[0].offsetHeight,
           _contentHeight = this.$el.offsetHeight;
+
+      if (_scrollTop / this.height - Math.floor(_scrollTop / this.height) > 0.5) {
+        this.displayCount = Math.ceil(_scrollTop / this.height);
+      } else {
+        this.displayCount = Math.floor(_scrollTop / this.height);
+      }
 
       if (this.lastScrollTop === null || Math.abs(_scrollTop - this.lastScrollTop) > this._max) {
           this.lastScrollTop = _scrollTop;
@@ -81,7 +91,9 @@ export default {
       this.to = _to;
       this.lineTopHeight = _from * this.height;
       this.lineBottomHeight = (this.list.length - _to) * this.height;
-      this.$emit('scrollData',this.from, this.to, this.lineTopHeight, this.lineBottomHeight);
+      if (typeof this.dispatchData === 'function') {
+        this.dispatchData(this)
+      }
 
       this.previewList = [];
       for (; _from < _to; _from++) {
@@ -94,7 +106,7 @@ export default {
       setTimeout(() => {
         for(var i = 0; i < 200; i++) {
           this.list.push({
-            title: 'list ' + new Date().getTime()
+            title: 'item ' + COUNT++
           });
         }
         let _from = from, _to = to + this._below;
@@ -132,7 +144,11 @@ export default {
       text-align: left;
       padding-left: 15px;
       border-bottom: 1px solid #ddd;
+      box-sizing: border-box;
       background: #fff;
+      &.line-top, &.line-bottom{
+        border-bottom: 0;
+      }
     }
   }
   .load-more-gif{
@@ -141,6 +157,8 @@ export default {
     text-align: center;
     line-height: 44px;
     background: #fff;
+    border-top: none;
+    color: #48B884;
   }
 }
 </style>

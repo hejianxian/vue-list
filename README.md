@@ -1,6 +1,6 @@
 # vue-list
 
-> An infinite load more list component.
+> A solution to build an infinite load more list component.
 
 ## Build Setup
 
