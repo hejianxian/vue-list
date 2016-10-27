@@ -1,7 +1,7 @@
 {
   "name": "vue-list",
   "version": "1.0.0",
-  "description": "An infinite load more list component.",
+  "description": "A solution to build an infinite load more list component.",
   "author": "Hejx <531601727@qq.com>",
   "private": true,
   "scripts": {
