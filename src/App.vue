@@ -3,7 +3,7 @@
     <header>
       <h1 class="title">vue-list</h1>
       <p>A solution to build an infinite load more list component.</p>
-      <p><a class="button" href="https://github.com/Alex-fun/vue-list">Code on Github</a></p>
+      <p><a class="button" href="https://github.com/Alex-fun/vue-list">Code on Github</a> / <a class="button" href="https://github.com/Alex-fun">My profile</a></p>
     </header>
     <div class="content">
       <div class="preview">
@@ -14,6 +14,7 @@
       <div class="setting">
         <h3>Scroll info</h3>
         <p>Total items: <span>{{list.length}}</span></p>
+        <p>Item height: <span>{{data.height}}px</span></p>
         <p>Above items: <span>{{data._above}}</span></p>
         <p>Below items: <span>{{data._below}}</span></p>
         <p>Rows in window: <span>{{data.displayCount + 1}}-{{(data.displayCount + data._rowsInWindow) > list.length ? list.length: (data.displayCount + data._rowsInWindow)}}</span></p>
@@ -108,6 +109,7 @@ html,body{
         left: 72px;
         top: 91px;
         background: #fff;
+        overflow-y: scroll;
       }
     }
     .setting{

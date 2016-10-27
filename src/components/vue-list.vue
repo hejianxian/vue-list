@@ -43,15 +43,13 @@ export default {
       displayCount: 0
     }
   },
-  computed: {},
-  created() {},
   mounted () {
     this.initData();
     this.handleScroll();
   },
-  attached () {},
   methods: {
     initData() {
+      // init all data
       this._rowsInWindow = Math.ceil(this.$el.offsetHeight / this.height),
       this._above = this._rowsInWindow * 2,
       this._below = this._rowsInWindow,
@@ -62,47 +60,60 @@ export default {
           _height = this.$el.querySelectorAll('ul')[0].offsetHeight,
           _contentHeight = this.$el.offsetHeight;
 
+      // Counts the number of rows on the current screen
       if (_scrollTop / this.height - Math.floor(_scrollTop / this.height) > 0.5) {
         this.displayCount = Math.ceil(_scrollTop / this.height);
       } else {
         this.displayCount = Math.floor(_scrollTop / this.height);
       }
 
+      // if the maximum height is exceeded, reset the previewList
       if (this.lastScrollTop === null || Math.abs(_scrollTop - this.lastScrollTop) > this._max) {
           this.lastScrollTop = _scrollTop;
       } else {
-          // console.log(_height, _scrollTop, _contentHeight, _height-_scrollTop-_contentHeight);
           if (this.to === this.list.length && _height - _scrollTop - _contentHeight < this.distance) {
             this.canScroll && this.loadmore(this.from, this.to);
           }
           return;
       }
 
-      var _from = parseInt(_scrollTop / this.height) - this._above;
+      // get from and to count
+      let _from = parseInt(_scrollTop / this.height) - this._above;
       if (_from < 0) {
           _from = 0;
       }
-      var _to = _from + this._above + this._below + this._rowsInWindow;
+      let _to = _from + this._above + this._below + this._rowsInWindow;
       if (_to > this.list.length) {
           _to = this.list.length;
       }
-
       this.from = _from;
       this.to = _to;
+
+      // set top height and bottom height
       this.lineTopHeight = _from * this.height;
       this.lineBottomHeight = (this.list.length - _to) * this.height;
+
+      // dispatch data
       if (typeof this.dispatchData === 'function') {
         this.dispatchData(this)
       }
 
-      this.previewList = [];
-      for (; _from < _to; _from++) {
-          this.previewList.push(this.list[_from]);
-      }
+      this.resetPreviewList(_from, _to);
+
+      this.$nextTick(() => {
+        let _scrollTop = this.$el.scrollTop,
+            _height = this.$el.querySelectorAll('ul')[0].offsetHeight,
+            _contentHeight = this.$el.offsetHeight;
+
+        if (_to === this.list.length && _height - _scrollTop - _contentHeight < 0) {
+            this.canScroll && this.loadmore(this.from, this.to);
+        }
+      });
     },
     loadmore(from, to) {
       if (!this.canLoadmore) return;
       this.canLoadmore = false;
+      // fetch mock
       setTimeout(() => {
         for(var i = 0; i < 200; i++) {
           this.list.push({
@@ -110,15 +121,19 @@ export default {
           });
         }
         let _from = from, _to = to + this._below;
-        this.previewList = [];
-        for (; _from < _to; _from++) {
-            this.previewList.push(this.list[_from])
-        }
+        this.resetPreviewList(_from, _to);
         this.lineBottomHeight = (this.list.length - _to) * this.height;
         this.handleScroll();
 
         this.canLoadmore = true;
       }, 2000)
+    },
+    resetPreviewList(from, to) {
+      // reset previewList
+      this.previewList = [];
+      for (; from < to; from++) {
+          this.previewList.push(this.list[from])
+      }
     }
   },
   components: {}
