@@ -1,5 +1,5 @@
-# vue-list
-> A solution to build an infinite load more list component.
+
+<img src="https://github.com/Alex-fun/vue-list/blob/master/src/assets/preview.png?raw=true" width="500" center alt="view"/>
 
 [在线DEMO](https://hejx.herokuapp.com/vue-list/)
 
