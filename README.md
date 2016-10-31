@@ -1,7 +1,9 @@
-
-<img src="https://github.com/Alex-fun/vue-list/blob/master/src/assets/preview.2.png?raw=true" width="500" center alt="view"/>
-
-[在线DEMO](https://hejx.herokuapp.com/vue-list/)
+<p align="center">
+  <a href="https://hejx.herokuapp.com/vue-list/">
+    <img src="https://github.com/Alex-fun/vue-list/blob/master/src/assets/preview.2.png?raw=true" width="300" center alt="view"/>
+  </a>
+  [在线DEMO](https://hejx.herokuapp.com/vue-list/)
+</p>
 
 ## 序
 
