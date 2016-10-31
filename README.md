@@ -3,8 +3,11 @@
     <img src="https://github.com/Alex-fun/vue-list/blob/master/src/assets/preview.2.png?raw=true" width="500" center alt="view"/>
   </a>
 </p>
-
-[在线DEMO](https://hejx.herokuapp.com/vue-list/)
+<p align="center">
+  <a href="https://hejx.herokuapp.com/vue-list/">
+    在线DEMO
+  </a>
+</p>
 
 ## 序
 
