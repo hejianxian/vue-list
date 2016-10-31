@@ -44,15 +44,17 @@ OK，假设现在列表的元素结构是酱紫的：
 
 首先，这里有一个前提，就是**列表的每个item的高度要一致**，这主要是为了方便计算。
 
-* screen: 我们可以理解为屏幕或者是显示列表的容器，我们主要是需要通过它来计算出当前screen里可以显示多少个item
 * above: 当前显示列表的上方，一般高度为screen高度的2倍
+* screen: 我们可以理解为屏幕或者是显示列表的容器，我们主要是需要通过它来计算出当前screen里可以显示多少个item
 * below: 当前屏幕下方
 
-默认情况下，它们所占的比例为1:2:1，那么这里要区分这3个区域，主要是为了列表在滚动的时候能够确保列表中有内容显示。
+默认情况下，它们所占的比例为2:1:1，那么这里要区分这3个区域，主要是为了列表在滚动的时候能够确保列表中有内容显示。这里最好就是直接看demo，更容易理解。
 
 ## 制作
 
-基于上面提出的3个问题，我们把列表的元素结构改一下：
+#### 一、保持总高度不变
+
+我们先把列表的元素结构改一下：
 
 ```html
 <div class="content">
@@ -68,20 +70,85 @@ OK，假设现在列表的元素结构是酱紫的：
 那么这里还是那个问题，怎样保持ul的总高度不变，其实方法有很多，
 
 * 1: 对ul设置总高度，然后显示item进行相对定位
+* 2: 在列表的开始和结尾各放一个元素来撑开高度（本列子使用的方法）
+* 3: 和方法1差不多，使用padding或者margin来撑开顶部高度
 
+#### 二、删除和显示元素
 
-既然是滚动加载，那肯定还是得监听滚动条。
+基于上一步，为了方便计算，我们只以顶部为计算目标，这样的一个好处就是，我们不需要管底部是什么情况，一切以顶部为准，进行元素的删除和显示。
 
-## 保持总高度
-
-## 加载新数据
-
-## Build Setup
-
-``` bash
-# install dependencies
-npm install
-
-# serve with hot reload at localhost:8080
-npm run dev
+```js
+if (this.lastScrollTop === null || Math.abs(_scrollTop - this.lastScrollTop) > this._max) {
+    this.lastScrollTop = _scrollTop;
+} else {
+    return;
+}
 ```
+
+根据我们之前定义的几个色块，这里主要是判断当screen（div.content）的scrollTop减去上一次的ScrollTop会大于最大高度_max（_max = screen的items数 * item高度）的时候,就会开始重组列表数据。也就是说，无论是向下还是向上滚动，只要满足`Math.abs(_scrollTop - this.lastScrollTop) > this._max`,都要重组列表数据。那么这里就会引申出下一个问题，应该取数据的那一部分为新的列表数据。
+
+#### 三、生成新数据
+
+基于item的高度是不变的这个条件，其实是很容易可以计算出当前列表的上方有多少个item，根据上面图片的3个色块，在页面上的元素应该要有4 * screen的items数，也就是`above+below+rowsInWindow`。
+
+那么可以通过div.content的scrollTop来计算出应该从列表数据第几个开始截取，也就是超出了above高度的item数，然后它的长度就是`above+below+rowsInWindow`。计算方式大概如下：
+
+```js
+let _from = parseInt(_scrollTop / this.height) - this._above;
+if (_from < 0) {
+    _from = 0;
+}
+let _to = _from + this._above + this._below + this._rowsInWindow;
+if (_to > this.list.length) {
+    _to = this.list.length;
+}
+```
+
+计算出了from和to后，就可以获取新的列表数据了。
+
+```js
+this.previewList = [];
+for (; from < to; from++) {
+    this.previewList.push(this.list[from])
+}
+```
+
+那么这里，我特意用了一个独立的数组previewList来保存要显示的列表数据，这样做主要是为了保证总列表数据的不变。新的数据生成之后，剩下的事情就交给vue去做了。
+
+#### 四、加载新的数据
+
+这里其实就是最简单的一步了。当列表被拉到最底下的时候，总的列表数据其实已经没有了。那么这个时候有2种情况下应该触发加载新的数据的方法。第一个就是to已经是数据长度的最大值，和在第二步的判断里retrun之前并且页面已经滚到了最底下。
+
+然后在这个时机触发加载更多数据的方法，那么加载了新的数据，form和to必须要重新计算，因为此时的below已经没有任何元素了。重置了from和to之后，再生成新的previewList列表，然后就完成了。
+
+```js
+loadmore(from, to) {
+  ...
+  // fetch mock
+  setTimeout(() => {
+    for(var i = 0; i < 200; i++) {
+      this.list.push({
+        title: 'item ' + COUNT++
+      });
+    }
+    let _from = from, _to = to + this._below; // 重新计算，这里还要处理加载回来的数据比below要求的还少的情况
+    this.resetPreviewList(_from, _to); // 重新计算previewList
+    ...
+  }, 2000)
+}
+```
+
+## 完成
+
+那么，大致上功能算是完成了，然后在demo上，我特意地添加了别的一些数据，这些东西其实在一些后台管理系统的数据table上非常有用。Demo里是每一次会加载200个数据，其实这里还可以再优化一下，可以在上啦的时候，每滚动一个屏幕的item数时，强行出现loading元素，这样在每个item内部元素特别多、条件判断特别多的时候，效果非常明显。
+
+## 写在最后
+
+这个repo真的完完全全只是提供一种解决方法，她没有经过任何浏览器的兼容测试。假若这个repo对你的项目或者你的学习有一点点帮助，那我就觉得很高兴了。
+
+最后，如果你觉得这歌repo还OK的话，请把她分享给更多的人，或者点一下star！谢谢！
+
+
+## License
+
+MIT
