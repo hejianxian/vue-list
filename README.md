@@ -1,5 +1,4 @@
 # vue-list
-
 > A solution to build an infinite load more list component.
 
 [在线DEMO](https://hejx.herokuapp.com/vue-list/)
