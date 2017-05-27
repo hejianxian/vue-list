@@ -1,9 +1,12 @@
 <template lang="html">
   <div class="vue-list" @scroll="handleScroll">
-    <ul>
-      <li class="line-top" :style="{height: lineTopHeight +'px'}"></li>
+    <ul :style="{
+      paddingTop: lineTopHeight +'px',
+      paddingBottom: lineBottomHeight +'px'
+    }">
+      <!--<li class="line-top" :style="{height: lineTopHeight +'px'}"></li>-->
       <li v-for="item in previewList">{{item.title}}</li>
-      <li class="line-bottom" :style="{height: lineBottomHeight +'px'}"></li>
+      <!--<li class="line-bottom" :style="{height: lineBottomHeight +'px'}"></li>-->
     </ul>
     <div class="load-more-gif">loading...</div>
   </div>
